@@ -1,0 +1,121 @@
+:root {
+  --desk: #ffffff;
+  --snap: cubic-bezier(0.23, 1, 0.32, 1);
+  --snap-time: 220ms;
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--desk);
+}
+
+body.is-dragging,
+body.is-dragging * {
+  cursor: grabbing !important;
+}
+
+.desk {
+  position: fixed;
+  inset: 0;
+}
+
+/* ---------- board: invisible until the finished image fades in ---------- */
+
+.board {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.board__master {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity var(--snap-time) var(--snap);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.board.is-complete .board__master { opacity: 1; }
+
+/* ---------- pieces ---------- */
+
+.piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  will-change: transform;
+}
+
+.piece img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  box-shadow:
+    0 1px 1.5px rgb(20 32 96 / 0.16),
+    0 3px 9px rgb(20 32 96 / 0.08);
+  transition:
+    transform 160ms var(--snap),
+    box-shadow 160ms var(--snap);
+}
+
+.piece.is-snapping {
+  transition: transform var(--snap-time) var(--snap);
+}
+
+.piece.is-placed {
+  cursor: default;
+  will-change: auto;
+}
+
+.piece.is-placed img {
+  box-shadow: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .piece:not(.is-placed):hover img {
+    transform: scale(1.015);
+    box-shadow:
+      0 1.5px 2px rgb(20 32 96 / 0.18),
+      0 5px 13px rgb(20 32 96 / 0.1);
+  }
+}
+
+.piece.is-held img {
+  transform: scale(1.015);
+  box-shadow:
+    0 2px 3px rgb(20 32 96 / 0.18),
+    0 7px 16px rgb(20 32 96 / 0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --snap-time: 1ms; }
+  .piece img { transition: none; }
+  .piece:not(.is-placed):hover img,
+  .piece.is-held img { transform: none; }
+}
